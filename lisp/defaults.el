@@ -55,12 +55,7 @@
 ;;(setq backup-directory-alist *backups-dir*)
 ;; I want to set backup-directory-alist, but having some issues.
 ;; This is the short term fix.
-;; (setq make-backup-files nil)
-
-(setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
-(setq auto-save-file-name-transforms
-      `((".*" ,temporary-file-directory t)))
+(setq make-backup-files nil)
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file)

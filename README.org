@@ -1,0 +1,3 @@
+* emacs.d
+
+This is my emacs config. I use [[https://github.com/jwiegley/use-package][use-package] to load everything.

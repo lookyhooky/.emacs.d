@@ -109,6 +109,7 @@
 
 (use-package projectile
   :ensure t
+  :diminish (projectile-mode . "Prjl")
   :init
   (setq projectile-known-projects-file
         (expand-file-name "projectile-bookmarks.eld" *savefiles-dir*))
