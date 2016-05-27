@@ -11,6 +11,10 @@
  "This directory contains my personal settings.")
 (add-to-list 'load-path *lisp-dir*)
 
+(defvar *snippets-dir*
+ (expand-file-name "snippets/" user-emacs-directory)
+ "This directory contains my snippets.")
+
 (defvar *themes-dir*
  (expand-file-name "themes/" user-emacs-directory)
  "This directory contains the themese.")
@@ -50,6 +54,13 @@
 
 (require 'use-package)
 
+;; Use the :init keyword to execute code before a package is loaded.
+;; It accepts one or more forms, up until the next keyword:
+
+;; Use the :config keyword to execute code after a package is loaded.
+;; In cases where loading is done lazily (see more about autoloading below),
+;; this execution is deferred until after the autoload occurs
+
 (use-package diminish
   :ensure t)
 
@@ -60,14 +71,15 @@
 (use-package ido
   :bind ("C-x M-f" . ido-find-file-other-window)
   :init
-  (ido-mode t)
   (setq ido-everywhere t)
   (setq ido-create-new-buffer 'always)
   (setq ido-max-prospects 10)
   (setq ido-save-directory-list-file
         (expand-file-name "ido.last" *savefiles-dir*))
   (setq ido-file-extensions-order '(".py" ".el" ".js" ".less"))
-  (add-to-list 'ido-ignore-files "\\.DS_Store"))
+  :config
+  (add-to-list 'ido-ignore-files "\\.DS_Store")
+  (ido-mode t))
 
 (use-package flx-ido
   :ensure t
@@ -80,18 +92,30 @@
 (use-package ido-vertical-mode
   :ensure t
   :init
-  (progn
-    (ido-vertical-mode t)
-    (setq ido-vertical-define-keys 'C-n-and-C-p-only))) ;; Bind C-n and C-p.
+  (setq ido-vertical-define-keys 'C-n-and-C-p-only) ;; Bind C-n and C-p.
+  :config
+  (ido-vertical-mode t))
 
 (use-package smex
   :ensure t
-  :init (smex-initialize)
-  :bind (("M-x" . smex)
-         ("M-X" . smex-major-mode-commands)
-         ("C-c C-c M-x" . execute-extended-command)) ;; The old M-x.
-  :config (setq smex-save-file
-		(expand-file-name "smex-items" *savefiles-dir*)))
+  :init
+  (setq smex-save-file
+		(expand-file-name "smex-items" *savefiles-dir*))
+  :bind  (("M-x" . smex)
+          ("M-X" . smex-major-mode-commands)
+          ("C-c C-c M-x" . execute-extended-command)) ;; The old M-x.
+  :config
+  (smex-initialize))
+
+(use-package projectile
+  :ensure t
+  :init
+  (setq projectile-known-projects-file
+        (expand-file-name "projectile-bookmarks.eld" *savefiles-dir*))
+  (setq projectile-cache-file
+        (expand-file-name "projectile.cache" *savefiles-dir*))
+  :config
+  (projectile-global-mode))
 
 (use-package recentf
   :init
@@ -122,9 +146,9 @@
 (use-package functions
   :load-path "lisp/"
   :bind (([remap move-beginning-of-line] . my/move-beginning-of-line)
-	 ([(meta o)] . my/open-line)
-	 ([(meta O)] . my/open-line-above)
-	 ("C-;" . my/toggle-comment-on-line)))
+         ([(meta o)] . my/open-line)
+         ([(meta O)] . my/open-line-above)
+         ("C-;" . my/toggle-comment-on-line)))
 
 (use-package paredit
   :ensure t
@@ -142,16 +166,16 @@
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
 
 (use-package uniquify
-  :config
+  :init
   (setq uniquify-buffer-name-style 'reverse)
   (setq uniquify-after-kill-buffer-p t)
   (setq uniquify-ignore-buffers-re "^\\*"))
 
-(use-package company
-  :ensure t
-  :defer 1
-  :config
-  (global-company-mode t))
+;; (use-package company
+;;   :ensure t
+;;   :defer 1
+;;   :config
+;;   (global-company-mode t))
 
 (use-package flycheck
   :ensure t
@@ -161,12 +185,42 @@
   :config
   (global-flycheck-mode t))
 
+(use-package auto-complete
+  :ensure t
+  :init
+  (setq ac-comphist-file (expand-file-name "ac-comphist.dat" *savefiles-dir*))
+  :config
+  (add-to-list 'ac-dictionary-directories "ac-dict")
+  (ac-config-default))
+
+(use-package yasnippet
+  :init
+  (setq yas-snippet-dirs
+        '(*snippets-dir*))
+  :config
+  (yas-reload-all))
+
+(require 'my-js-config)
+
+(use-package js-mode
+  :defines js-indent-level
+  :diminish (js-mode . "JS")
+  :mode "\\.js$"
+  :init
+  (setq js-indent-level 2)
+  :config
+  (add-hook 'js-mode-hook 'my/js-hook)
+  (add-hook 'js-mode-hook #'yas-minor-mode))
+
+(require 'my-python-config)
 (use-package python-mode
   :defines python-indent
   :mode "\\.py\\'"
   :interpreter "python"
+  :init
+  (setq python-indent 4)
   :config
-  (setq python-indent 4))
+  (add-hook 'python-mode-hook 'my/python-hook))
 
 (provide 'init)
 

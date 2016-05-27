@@ -23,7 +23,7 @@
 ;; Set font face.
 (set-frame-font "Source Code Pro")
 
-;;(load-theme 'zenburn t)
+;; (load-theme 'zenburn t)
 (load-theme 'monokai t)
 
 

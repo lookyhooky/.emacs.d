@@ -1,6 +1,15 @@
 /elpa
-/savefiles
+/tern
+/thems
+/eshell
 /backups
+/savefiles
 /auto-save-list
+
+# emacs backups and auto-save symbolic links
+*~
+.#*
+
+/.python-environments
 
 .DS_Store

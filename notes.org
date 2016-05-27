@@ -1,0 +1,13 @@
+'M-x list-packages U x' Upgrades all installed packages
+'M-z' zap-up-to-char
+
+'C-SPC' Set Mark
+'C-x C-x' Go back to previous mark... though this sets a mark before going back
+
+Using univeral argement with the mark command.
+'C-u C-SPC' Cycle back through the mark ring
+
+I am using TransientMarkMode and do not want to begin highlighting
+when all I want is to save my place, the possible commands are
+'C-SPC C-g' Set Mark and then abort the command or...
+'C-SPC C-SPC' Probably much quicker.
