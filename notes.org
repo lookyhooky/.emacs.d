@@ -1,13 +1,137 @@
-'M-x list-packages U x' Upgrades all installed packages
-'M-z' zap-up-to-char
+* Emacs Configurations Notes
+~M-x list-packages U x~ Upgrades all installed packages
+~M-z~ zap-up-to-char
 
-'C-SPC' Set Mark
-'C-x C-x' Go back to previous mark... though this sets a mark before going back
+~C-SPC~ Set Mark
+~C-x C-x~ Go back to previous mark... though this sets a mark before going back
 
 Using univeral argement with the mark command.
-'C-u C-SPC' Cycle back through the mark ring
+~C-u C-SPC~ Cycle back through the mark ring
 
 I am using TransientMarkMode and do not want to begin highlighting
 when all I want is to save my place, the possible commands are
-'C-SPC C-g' Set Mark and then abort the command or...
-'C-SPC C-SPC' Probably much quicker.
+~C-SPC C-g~ Set Mark and then abort the command or...
+~C-SPC C-SPC~ Probably much quicker.
+
+** Spelling
+~M-$~ ispell-word at point or region
+
+** Bookmarks
+~C-x r m~ – set a bookmark at the current location (e.g. in a file)
+~C-x r b~ – jump to a bookmark
+~C-x r l~ – list your bookmarks
+~M-x bookmark-delete~ – delete a bookmark by name
+
+** Functions & Variables
+Functions and variables can share names, they are maintained seperately.
+~setq~ : The ~q~ is for quote.
+~(set symbol 'value)~ short hand for ~(set 'symbol 'value)~
+In this special form, the symbol is literal (not evaluated)
+It also allows setting mutliple variables from one expression
+#+BEGIN_SRC emacs-lisp
+  (setq trees '(pine fir oak maple)
+        herbivores '(gazelle antelope zebra))
+#+END_SRC
+
+
+** Emacs Lisp REPL
+~M-x ielm~ inferior emacs lisp mode
+
+** Buffers
+~C-x <right>~ next-buffer
+~C-x <left>~ previous-buffer
+
+~append-to-buffer~ Append region before point in a specified buffer.
+
+** Help
+~C-h f~ describe-function
+~C-h v~ describe-variable
+
+** Movement
+~C-x o~ other-window : cycle other visible windows
+~M-{~ backward-paragraph
+~M-}~ forward-paragraph
+
+** Prefix
+universal-argument followed by a number then the key chord
+~C-u~ defaults to 4 times, ~C-u Cu~ would be 16
+Example ~C-u 3 C-f~ call forward-char 3 times
+
+digit-argument ~M-3~ 3
+negative-argument ~M--~ -1
+<Meta> in combination with a number followed by key chord
+Example ~M-3 C-f~ call forward-char 3 times
+
+** Evaluate
+~M-:~ eval-expression : evaluate single sexp in minibuffer
+~C-x C-e~ eval-last-sexp
+~C-u C-x C-e~  eval-last-sexp and output to buffer
+
+** Read More
+~save-excursion~
+
+#+BEGIN_SRC emacs-lisp
+  (message "We are %d characters into this buffer."
+                     (- (point)
+                        (save-excursion
+                          (goto-char (point-min)) (point))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (let ((foo (buffer-name))
+        (bar (buffer-size)))
+    (message
+     "This buffer is %s and has %d characters."
+     foo bar))
+#+END_SRC
+** Mark
+~C-SPC~ set-mark-command
+Set the mark at point and push the old mark position on local mark ring.
+~C-SPC C-SPC~ push-mark without activating it.
+The second set-mark-command deactivates the current mark.
+~C-u C-SPC~ jump to the mark and set the mark from postion popped
+off the local mark ring (does't affect the global mark ring)
+
+~C-x h~ mark-whole-buffer
+
+push-mark Set mark at LOCATION (point, by default) and push old
+mark on mark ring.
+
+Novice Emacs Lisp programmers often try to use the mark for the wrong
+purposes.  The mark saves a location for the user's convenience.
+Most editing commands should not alter the mark.
+To remember a location for internal use in the Lisp program,
+store it in a Lisp variable.  Example:
+
+   (let ((beg (point))) (forward-line 1) (delete-region beg (point)))
+
+Read More About...
+
+set-mark-command-repeat-pop : can be use with ~C-u C-u C-SPC~ even if
+value is nil
+
+** Let
+A ~let~ expression is just "syntactic sugar" for a corresponding ~lambda~ form
+
+#+BEGIN_SRC emacs-lisp
+  (let ((a 1)
+        (b 3))
+    (+ a b))
+#+END_SRC
+
+The expression above is equivalent to
+
+#+BEGIN_SRC emacs-lisp
+  ((lambda (a b) (+ a b)) 1 3)
+#+END_SRC
+
+~let*~ Same as let though binds each symbol in sequence, so the varlist can
+make use of variables defined earlier in the varlist.
+
+** Windows
+~C-x 0~ Delete selected window
+** ERC
+~erc-track-mode~ temporarily disable channel tracking
+Don't know if it works
+Might need this...
+~(setq erc-track-exclude-types '("JOIN" "NICK" "PART" "QUIT"))~

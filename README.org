@@ -1,3 +1,7 @@
-* emacs.d
+#+STARTUP: indent
+#+STARTUP: hidestars
+#+STARTUP: showstars
+#+STARTUP: showall
 
-This is my emacs config. I use [[https://github.com/jwiegley/use-package][use-package] to load everything.
+* emacs.d
+This is my emacs config. I use [[https://github.com/jwiegley/use-package][use-package]] to load everything.

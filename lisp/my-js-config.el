@@ -7,10 +7,13 @@
 ;;; Code:
 
 (defvar *tern-dir*
- (expand-file-name "tern/emacs/" user-emacs-directory)
- "This directory contains tern.")
+  (expand-file-name "tern/emacs/" user-emacs-directory)
+  "This directory contains tern.")
+
 (add-to-list 'load-path *tern-dir*)
+
 (autoload 'tern-mode "tern.el" nil t)
+
 ;; Use auto-complete for tern completion.
 (eval-after-load 'tern-mode
   '(progn

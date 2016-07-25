@@ -17,7 +17,7 @@
 
 (defvar *themes-dir*
  (expand-file-name "themes/" user-emacs-directory)
- "This directory contains the themese.")
+ "This directory contains the themes.")
 (add-to-list 'custom-theme-load-path *themes-dir*)
 
 (defvar *savefiles-dir*
@@ -147,9 +147,16 @@
 (use-package functions
   :load-path "lisp/"
   :bind (([remap move-beginning-of-line] . my/move-beginning-of-line)
-         ([(meta o)] . my/open-line)
-         ([(meta O)] . my/open-line-above)
+         ("M-o" . my/open-line)
+         ("M-O" . my/open-line-above)
          ("C-;" . my/toggle-comment-on-line)))
+
+(use-package my-toggle-buffer
+  :load-path "lisp/"
+  :bind (("C-o" . my/toggle-buffer)))
+
+;; Decided to clobber `open-line' in favor of mode-line-other-buffer
+;; I perfer my/open-line functions anyway.
 
 (use-package paredit
   :ensure t
@@ -159,7 +166,8 @@
   (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
   (add-hook 'lisp-mode-hook #'enable-paredit-mode)
   (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-  (add-hook 'scheme-mode-hook #'enable-paredit-mode))
+  (add-hook 'scheme-mode-hook #'enable-paredit-mode)
+  )
 
 (use-package rainbow-delimiters
   :ensure t
@@ -186,13 +194,20 @@
   :config
   (global-flycheck-mode t))
 
-(use-package auto-complete
-  :ensure t
-  :init
-  (setq ac-comphist-file (expand-file-name "ac-comphist.dat" *savefiles-dir*))
-  :config
-  (add-to-list 'ac-dictionary-directories "ac-dict")
-  (ac-config-default))
+;; (use-package auto-complete
+;;   :ensure t
+;;   :init
+;;   (setq ac-comphist-file (expand-file-name "ac-comphist.dat" *savefiles-dir*))
+;;   ;; resetting ac-sources
+;;   (setq-default ac-sources '(
+;;                              ac-source-yasnippet
+;;                              ac-source-abbrev
+;;                              ac-source-dictionary
+;;                              ac-source-words-in-same-mode-buffers))
+;;   :config
+;;   (add-to-list 'ac-dictionary-directories "ac-dict")
+;;   (ac-config-default))
+(use-package company)
 
 (use-package yasnippet
   :init
@@ -201,8 +216,40 @@
   :config
   (yas-reload-all))
 
-(require 'my-js-config)
+(use-package elm-mode
+  :config
+  (add-hook 'flycheck-mode-hook #'flycheck-elm-setup))
 
+(use-package magit
+  :bind (("C-x g" . magit-status)))
+
+(use-package clojure-mode
+  :defines inferior-lisp-program
+  :init
+  (setq inferior-lisp-program "lein repl")
+  :config
+  (add-hook 'clojure-mode-hook #'subword-mode)
+  (add-hook 'clojure-mode-hook #'company-mode)
+  (add-hook 'clojure-mode-hook #'enable-paredit-mode))
+
+(use-package cider
+  :init
+  ;; go right to the REPL buffer when it's finished connecting
+  (setq cider-repl-pop-to-buffer-on-connect t)
+  ;; When there's a cider error, show its buffer and switch to it
+  (setq cider-show-error-buffer t)
+  (setq cider-auto-select-error-buffer t)
+  ;; Where to store the cider history.
+  (setq cider-repl-history-file "~/.emacs.d/cider-history")
+  ;; Wrap when navigating history.
+  (setq cider-repl-wrap-history t)
+  :config
+  ;; provides minibuffer documentation for the code you're typing into the repl
+  (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+  ;; enable paredit in your REPL
+  (add-hook 'cider-repl-mode-hook 'paredit-mode))
+
+(require 'my-js-config)
 (use-package js-mode
   :defines js-indent-level
   :diminish (js-mode . "JS")
@@ -213,15 +260,45 @@
   (add-hook 'js-mode-hook 'my/js-hook)
   (add-hook 'js-mode-hook #'yas-minor-mode))
 
-(require 'my-python-config)
-(use-package python-mode
-  :defines python-indent
-  :mode "\\.py\\'"
-  :interpreter "python"
-  :init
-  (setq python-indent 4)
-  :config
-  (add-hook 'python-mode-hook 'my/python-hook))
+;; (require 'my-python-config)
+;; (use-package python-mode
+;;   :defines python-indent
+;;   :mode "\\.py\\'"
+;;   :interpreter "python"
+;;   :init
+;;   (setq python-indent 4)
+;;   :config
+;;   (add-hook 'python-mode-hook 'my/python-hook))
+
+(defun my/org-mode-hook ()
+  "Stop the org-level headers from increasing `:height' relative to the other text."
+  (dolist (face '(org-level-1
+                  org-level-2
+                  org-level-3
+                  org-level-4
+                  org-level-5))
+    (set-face-attribute face nil :weight 'semi-bold :height 1.0)))
+(add-hook 'org-mode-hook 'my/org-mode-hook)
+
+;; php-mode
+;; (add-hook 'php-mode-hook #'yas-minor-mode)
+
+;; Adding this was the only way I could get dictionary to work
+;; found it on emacswiki https://www.emacswiki.org/emacs/InteractiveSpell
+(setenv "DICTIONARY" "en_US")
+
+(with-eval-after-load "ispell"
+  (setq ispell-program-name "hunspell"))
+
+;; not working
+(defun comint-clear-buffer ()
+  "Clear the comint buffer."
+  (interactive)
+  (let ((comint-buffer-maximum-size 0))
+    (comint-truncate-buffer)))
+
+;; let's bind the new command to a keycombo
+(define-key comint-mode-map "\C-c\M-o" #'comint-clear-buffer)
 
 (provide 'init)
 

@@ -1,5 +1,9 @@
 ;;;  ui.el --- Emacs aesthetic customizations.
 
+;; Local Variables:
+;; byte-compile-warnings: (not free-vars)
+;; End:
+
 ;;; Commentary:
 
 ;;; Configure ui early in initialization process.
@@ -18,14 +22,25 @@
 (add-to-list 'initial-frame-alist '(width . 90))
 
 ;; Increase font size.
-(set-face-attribute 'default nil :height 150)
+(set-face-attribute 'default nil :height 140)
 
 ;; Set font face.
 (set-frame-font "Source Code Pro")
 
 ;; (load-theme 'zenburn t)
 (load-theme 'monokai t)
+(setq monokai-use-variable-pitch nil)
+;; (with-eval-after-load "monokai-theme" (setq monokai-use-variable-pitch nil))
 
+(defun my/org-mode-hook ()
+  "Stop the org-level headers from increasing `:height' relative to the other text."
+  (dolist (face '(org-level-1
+                  org-level-2
+                  org-level-3
+                  org-level-4
+                  org-level-5))
+    (set-face-attribute face nil :weight 'semi-bold :height 1.0)))
+;; (add-hook 'org-mode-hook 'my/org-mode-hook)
 
 (provide 'ui)
 

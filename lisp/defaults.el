@@ -6,12 +6,13 @@
 
 ;;; Code:
 
-(autoload 'zap-up-to-char "misc"
-  "Kill up to, but not including ARGth occurence of CHAR/" t)
+;; I'll try using zap-to-char...
+;; (autoload 'zap-up-to-char "misc"
+;;   "Kill up to, but not including ARGth occurence of CHAR/" t)
 
 (global-set-key (kbd "M-/") 'hippie-expand)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
-(global-set-key (kbd "M-z") 'zap-up-to-char)
+;; (global-set-key (kbd "M-z") 'zap-up-to-char)
 
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
@@ -22,7 +23,9 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; Show line numbers
-(global-linum-mode)
+;; Adding a hook to prog-mode seems better to me than global
+;; (global-linum-mode)
+(add-hook 'prog-mode-hook 'linum-mode)
 
 ;; Highlight current line
 (global-hl-line-mode 1)

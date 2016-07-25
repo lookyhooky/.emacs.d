@@ -43,6 +43,14 @@ Position the cursor at it's beginning, according to the current mode."
   (forward-line -1)
   (indent-according-to-mode))
 
+;; A possibliy difference keybinding choice
+;; (global-set-key [(control shift return)] 'smart-open-line-above)
+
+;; (defun my/toggle-buffer ()
+;;   "Switch to previous buffer."
+;;   (interactive)
+;;   (switch-to-buffer (other-buffer (current-buffer) nil)))
+
 (defun my/toggle-comment-on-line ()
   "Comment or uncomment current line."
   (interactive)
