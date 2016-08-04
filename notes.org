@@ -3,44 +3,36 @@
 
 ~M-z~ zap-up-to-char
 
-~C-SPC~ Set Mark
-
-~C-x C-x~ Go back to previous mark... though this sets a mark before going back
-
-Using univeral argement with the mark command.
-
-~C-u C-SPC~ Cycle back through the mark ring
+** Mark
+- ~C-SPC~ Set Mark
+- ~C-x C-x~ Go back to previous mark... though this sets a mark before going back
+- ~C-u C-SPC~ Cycle back through the mark ring ring using the univeral argement
+  with the mark command.
 
 I am using TransientMarkMode and do not want to begin highlighting
-
 when all I want is to save my place, the possible commands are
 
-~C-SPC C-g~ Set Mark and then abort the command or...
-
-~C-SPC C-SPC~ Probably much quicker.
+- ~C-SPC C-g~ Set Mark and then abort the command or...
+- ~C-SPC C-SPC~ Probably much quicker.
 
 ** Spelling
 ~M-$~ ispell-word at point or region
 
 ** Bookmarks
-~C-x r m~ – set a bookmark at the current location (e.g. in a file)
-
-~C-x r b~ – jump to a bookmark
-
-~C-x r l~ – list your bookmarks
-
-~M-x bookmark-delete~ – delete a bookmark by name
+- ~C-x r m~ – set a bookmark at the current location (e.g. in a file)
+- ~C-x r b~ – jump to a bookmark
+- ~C-x r l~ – list your bookmarks
+- ~M-x bookmark-delete~ – delete a bookmark by name
 
 ** Functions & Variables
 Functions and variables can share names, they are maintained seperately.
 
-~setq~ : The ~q~ is for quote.
+~setq~ The ~q~ is for quote.
 
-~(set symbol 'value)~ short hand for ~(set 'symbol 'value)~,
-which is even more short hand for ~(set (quote symbol) value)~
+~(set symbol 'value)~ short hand for ~(set 'symbol 'value)~
 
-In this special form, the symbol is literal (not evaluated)
-It also allows setting mutliple variables from one expression
+In this special form, the symbol is literal (not evaluated).
+It is also possible to set mutliple variables from one expression.
 
 #+BEGIN_SRC emacs-lisp
   (setq trees '(pine fir oak maple)
@@ -48,30 +40,25 @@ It also allows setting mutliple variables from one expression
 #+END_SRC
 
 ** Emacs Lisp REPL
-~M-x ielm~ inferior emacs lisp mode
-
-~C-<up>~ previous expression in history
-
-~C-<down>~ next expression in history
+- ~M-x ielm~ inferior emacs lisp mode
+- ~C-<up>~ previous expression in history
+- ~C-<down>~ next expression in history
 
 ** Buffers
-~C-x <right>~ next-buffer
-
-~C-x <left>~ previous-buffer
+- ~C-x <right>~ next-buffer
+- ~C-x <left>~ previous-buffer
 
 ~append-to-buffer~ Append region before point in a specified buffer.
 
 ** Help
-~C-h f~ describe-function
-
-~C-h v~ describe-variable
+- ~C-h f~ describe-function
+- ~C-h v~ describe-variable
+- ~C-h k~ describe-key
 
 ** Movement
-~C-x o~ other-window : cycle other visible windows
 
-~M-{~ backward-paragraph
-
-~M-}~ forward-paragraph
+- ~M-{~ backward-paragraph
+- ~M-}~ forward-paragraph
 
 ** Prefix
 universal-argument followed by a number then the key chord
@@ -113,16 +100,16 @@ Example ~M-3 C-f~ call forward-char 3 times
 #+END_SRC
 
 ** Mark
-~C-SPC~ set-mark-command
-Set the mark at point and push the old mark position on local mark ring.
+- ~C-SPC~ set-mark-command
+  Set the mark at point and push the old mark position on local mark ring.
 
-~C-SPC C-SPC~ push-mark without activating it.
-The second set-mark-command deactivates the current mark.
+- ~C-SPC C-SPC~  push-mark without activating it.
+  The second set-mark-command deactivates the current mark.
 
-~C-u C-SPC~ jump to the mark and set the mark from postion popped
-off the local mark ring (does't affect the global mark ring)
+- ~C-u C-SPC~ jump to the mark and set the mark from postion popped
+  off the local mark ring (does't affect the global mark ring)
 
-~C-x h~ mark-whole-buffer
+- ~C-x h~ mark-whole-buffer
 
 push-mark Set mark at LOCATION (point, by default) and push old
 mark on mark ring.
@@ -163,7 +150,16 @@ The expression above is equivalent to
 in the varlist can make use of those previously defined.
 
 ** Windows
-~C-x 0~ Delete selected window
+- ~C-x 0~ Delete selected window
+- ~C-x 1~ Delete other windows, single window fills the frame
+- ~C-x 2~ New window below
+- ~C-x 3~ New window on right
+- ~C-x o~ Cycle other visible windows
+
+*** Winner-mode
+The important key chords are:
+- ~C-x <left>~ Undo
+- ~C-x <right>~ Redo
 
 ** ERC
 ~erc-track-mode~ temporarily disable channel tracking \\
@@ -173,10 +169,7 @@ Might need this... \\
 ~(setq erc-track-exclude-types '("JOIN" "NICK" "PART" "QUIT"))~
 
 ** Org-mode
-~C-c '\~ Edit source code block and return to org file from block.
-
-~<TAB>~ key chord for ~org-cycle~ local visibility cycling
-
-~C-u <TAB>~  key chord for ~org-global-cycle~ visibility
-
-~C-u C-u C-u <TAB>~ key choard fro ~show-all~ Unfold all
+- ~C-c '\~ Edit source code block and return to org file from block.
+- ~<TAB>~ key chord for ~org-cycle~ local visibility cycling
+- ~C-u <TAB>~  key chord for ~org-global-cycle~ visibility
+- ~C-u C-u C-u <TAB>~ key chord fro ~show-all~ Unfold all
