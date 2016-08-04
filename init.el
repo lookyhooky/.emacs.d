@@ -215,6 +215,7 @@
   :defer 2
   :init
   (setq-default flycheck-disabled-checkers '(javascript-eslint))
+  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
   (setq-default flycheck-emacs-lisp-load-path load-path)
   :config
   (global-flycheck-mode t))
