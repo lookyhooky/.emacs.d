@@ -28,8 +28,9 @@
 (set-frame-font "Source Code Pro")
 
 ;; (load-theme 'zenburn t)
-(load-theme 'monokai t)
-(setq monokai-use-variable-pitch nil)
+;; (load-theme 'monokai t)
+
+;; (setq monokai-use-variable-pitch nil)
 ;; (with-eval-after-load "monokai-theme" (setq monokai-use-variable-pitch nil))
 
 (defun my/org-mode-hook ()
@@ -40,7 +41,7 @@
                   org-level-4
                   org-level-5))
     (set-face-attribute face nil :weight 'semi-bold :height 1.0)))
-;; (add-hook 'org-mode-hook 'my/org-mode-hook)
+(add-hook 'org-mode-hook 'my/org-mode-hook)
 
 (provide 'ui)
 

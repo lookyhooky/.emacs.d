@@ -1,6 +1,15 @@
-;;;;
-;; Clojure
-;;;;
+;;; my-clojure-config.el --- My clojure setup
+
+;; Local Variables:
+;; byte-compile-warnings: (not free-vars)
+;; End:
+
+;;; Commentary:
+
+;;; Code:
+
+(require 'clojure-mode)
+(require 'cider)
 
 ;; Enable paredit for Clojure
 (add-hook 'clojure-mode-hook 'enable-paredit-mode)
@@ -10,7 +19,7 @@
 (add-hook 'clojure-mode-hook 'subword-mode)
 
 ;; A little more syntax highlighting
-(require 'clojure-mode-extra-font-locking)
+;; (require 'clojure-mode-extra-font-locking)
 
 ;; syntax hilighting for midje
 (add-hook 'clojure-mode-hook
@@ -54,7 +63,6 @@
 (add-to-list 'auto-mode-alist '("\\.cljs.*$" . clojure-mode))
 (add-to-list 'auto-mode-alist '("lein-env" . enh-ruby-mode))
 
-
 ;; key bindings
 ;; these help me out with the way I usually develop web apps
 (defun cider-start-http-server ()
@@ -80,3 +88,6 @@
      (define-key clojure-mode-map (kbd "C-M-r") 'cider-refresh)
      (define-key clojure-mode-map (kbd "C-c u") 'cider-user-ns)
      (define-key cider-mode-map (kbd "C-c u") 'cider-user-ns)))
+
+(provide my-clojure-config)
+;;; my-clojure-config.el ends here

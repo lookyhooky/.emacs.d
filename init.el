@@ -11,6 +11,15 @@
  "This directory contains my personal settings.")
 (add-to-list 'load-path *lisp-dir*)
 
+(defvar *node-modules-dir*
+ (expand-file-name "node_modules/" user-emacs-directory)
+ "This directory contains npm packages required for my-js-config.el.")
+
+(defvar *tern-dir*
+  (expand-file-name "tern/emacs/" *node-modules-dir*)
+  "This directory contains tern.")
+(add-to-list 'load-path *tern-dir*)
+
 (defvar *snippets-dir*
  (expand-file-name "snippets/" user-emacs-directory)
  "This directory contains my snippets.")
@@ -31,6 +40,8 @@
   "This directory contains backup files of buffers being edited.")
 (unless (file-exists-p *backups-dir*)
  (make-directory *backups-dir*))
+
+(setq default-directory (concat (getenv "HOME") "/Documents/projects"))
 
 (require 'ui) ;; Remove mouse ui and adusting window size right away.
 (require 'defaults) ;; My default setting.
@@ -61,12 +72,24 @@
 ;; In cases where loading is done lazily (see more about autoloading below),
 ;; this execution is deferred until after the autoload occurs
 
-(use-package diminish
-  :ensure t)
+(use-package monokai-theme
+  :ensure t
+  :init
+  (load-theme 'monokai t))
 
 (if (eq system-type 'darwin)
     (use-package exec-path-from-shell
       :config (require 'shell-intergration)))
+
+;; Add package node_modules directory to exec-path
+(let ((node-bin (concat *node-modules-dir* ".bin")))
+  (setenv "PATH" (concat node-bin ":" (getenv "PATH")))
+  (setq exec-path (cons node-bin exec-path)))
+
+(use-package diminish
+  :ensure t
+  :init
+  (eval-after-load "js-mode" (diminish 'js-mode "JS")))
 
 (use-package ido
   :bind ("C-x M-f" . ido-find-file-other-window)
@@ -161,13 +184,14 @@
 (use-package paredit
   :ensure t
   :diminish paredit-mode
-  :config
+  :init
   (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
   (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
   (add-hook 'lisp-mode-hook #'enable-paredit-mode)
   (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
   (add-hook 'scheme-mode-hook #'enable-paredit-mode)
-  )
+  (add-hook 'slime-mode-hook #'enable-paredit-mode)
+  (add-hook 'slime-repl-mode #'enable-paredit-mode))
 
 (use-package rainbow-delimiters
   :ensure t
@@ -190,24 +214,32 @@
   :ensure t
   :defer 2
   :init
+  (setq-default flycheck-disabled-checkers '(javascript-eslint))
   (setq-default flycheck-emacs-lisp-load-path load-path)
   :config
   (global-flycheck-mode t))
 
-;; (use-package auto-complete
-;;   :ensure t
-;;   :init
-;;   (setq ac-comphist-file (expand-file-name "ac-comphist.dat" *savefiles-dir*))
-;;   ;; resetting ac-sources
-;;   (setq-default ac-sources '(
-;;                              ac-source-yasnippet
-;;                              ac-source-abbrev
-;;                              ac-source-dictionary
-;;                              ac-source-words-in-same-mode-buffers))
-;;   :config
-;;   (add-to-list 'ac-dictionary-directories "ac-dict")
-;;   (ac-config-default))
-(use-package company)
+(use-package whitespace-cleanup-mode
+  :ensure t
+  :init
+  (add-hook 'js-mode-hook 'whitespace-cleanup-mode)
+  (add-hook 'elm-mode-hook 'whitespace-cleanup-mode)
+  (add-hook 'lisp-mode-hook 'whitespace-cleanup-mode)
+  (add-hook 'elisp-mode-hook 'whitespace-cleanup-mode))
+
+(use-package auto-complete
+  :ensure t
+  :init
+  (setq ac-comphist-file (expand-file-name "ac-comphist.dat" *savefiles-dir*))
+  ;; resetting ac-sources
+  (setq-default ac-sources '(
+                             ac-source-yasnippet
+                             ac-source-abbrev
+                             ac-source-dictionary
+                             ac-source-words-in-same-mode-buffers))
+  :config
+  (add-to-list 'ac-dictionary-directories "ac-dict")
+  (ac-config-default))
 
 (use-package yasnippet
   :init
@@ -217,71 +249,81 @@
   (yas-reload-all))
 
 (use-package elm-mode
-  :config
-  (add-hook 'flycheck-mode-hook #'flycheck-elm-setup))
+  :ensure t)
+
+(add-to-list 'load-path (expand-file-name "flycheck-elm/" user-emacs-directory))
+
+(require 'flycheck-elm)
+
+(eval-after-load 'flycheck
+  '(add-hook 'flycheck-mode-hook #'flycheck-elm-setup))
 
 (use-package magit
   :bind (("C-x g" . magit-status)))
 
-(use-package clojure-mode
-  :defines inferior-lisp-program
-  :init
-  (setq inferior-lisp-program "lein repl")
-  :config
-  (add-hook 'clojure-mode-hook #'subword-mode)
-  (add-hook 'clojure-mode-hook #'company-mode)
-  (add-hook 'clojure-mode-hook #'enable-paredit-mode))
+;; (use-package clojure-mode
+;;   :defines inferior-lisp-program
+;;   :init
+;;   (setq inferior-lisp-program "lein repl")
+;;   :config
+;;   (add-hook 'clojure-mode-hook #'subword-mode)
+;;   (add-hook 'clojure-mode-hook #'company-mode)
+;;   (add-hook 'clojure-mode-hook #'enable-paredit-mode))
 
-(use-package cider
-  :init
-  ;; go right to the REPL buffer when it's finished connecting
-  (setq cider-repl-pop-to-buffer-on-connect t)
-  ;; When there's a cider error, show its buffer and switch to it
-  (setq cider-show-error-buffer t)
-  (setq cider-auto-select-error-buffer t)
-  ;; Where to store the cider history.
-  (setq cider-repl-history-file "~/.emacs.d/cider-history")
-  ;; Wrap when navigating history.
-  (setq cider-repl-wrap-history t)
-  :config
-  ;; provides minibuffer documentation for the code you're typing into the repl
-  (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
-  ;; enable paredit in your REPL
-  (add-hook 'cider-repl-mode-hook 'paredit-mode))
+;; (use-package cider
+;;   :init
+;;   ;; go right to the REPL buffer when it's finished connecting
+;;   (setq cider-repl-pop-to-buffer-on-connect t)
+;;   ;; When there's a cider error, show its buffer and switch to it
+;;   (setq cider-show-error-buffer t)
+;;   (setq cider-auto-select-error-buffer t)
+;;   ;; Where to store the cider history.
+;;   (setq cider-repl-history-file "~/.emacs.d/cider-history")
+;;   ;; Wrap when navigating history.
+;;   (setq cider-repl-wrap-history t)
+;;   :config
+;;   ;; provides minibuffer documentation for the code you're typing into the repl
+;;   (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+;;   ;; enable paredit in your REPL
+;;   (add-hook 'cider-repl-mode-hook 'paredit-mode))
+
+
+;; (use-package js2-mode
+;;   :diminish "JS"
+;;   :init
+;;   (setq js2-strict-missing-semi-warning nil)
+;;   (setq js2-basic-offset 2)
+;;   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+;;   (add-to-list 'interpreter-mode-alist '("node" . js2-mode)))
+
+(require 'slime-autoloads)
+
+(setq inferior-lisp-program "/usr/local/bin/sbcl")
+(setq slime-contribs '(slime-fancy))
+(add-to-list 'auto-mode-alist '("\\.cl$" . lisp-mode))
 
 (require 'my-js-config)
+
 (use-package js-mode
   :defines js-indent-level
   :diminish (js-mode . "JS")
   :mode "\\.js$"
   :init
   (setq js-indent-level 2)
-  :config
-  (add-hook 'js-mode-hook 'my/js-hook)
+  (setq js-switch-indent-offset 2)      ; Offset switch statements properly.
+  (add-hook 'js-mode-hook #'my/js-hook)
   (add-hook 'js-mode-hook #'yas-minor-mode))
 
-;; (require 'my-python-config)
-;; (use-package python-mode
-;;   :defines python-indent
-;;   :mode "\\.py\\'"
-;;   :interpreter "python"
-;;   :init
-;;   (setq python-indent 4)
-;;   :config
-;;   (add-hook 'python-mode-hook 'my/python-hook))
-
-(defun my/org-mode-hook ()
-  "Stop the org-level headers from increasing `:height' relative to the other text."
-  (dolist (face '(org-level-1
-                  org-level-2
-                  org-level-3
-                  org-level-4
-                  org-level-5))
-    (set-face-attribute face nil :weight 'semi-bold :height 1.0)))
-(add-hook 'org-mode-hook 'my/org-mode-hook)
-
-;; php-mode
-;; (add-hook 'php-mode-hook #'yas-minor-mode)
+(use-package web-mode
+  :ensure t
+  :init
+  ;; Adjust Indent
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-attr-indent-offset 2)
+  (setq web-mode-enable-auto-pairing t)
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode)))
 
 ;; Adding this was the only way I could get dictionary to work
 ;; found it on emacswiki https://www.emacswiki.org/emacs/InteractiveSpell
@@ -290,15 +332,15 @@
 (with-eval-after-load "ispell"
   (setq ispell-program-name "hunspell"))
 
-;; not working
-(defun comint-clear-buffer ()
-  "Clear the comint buffer."
-  (interactive)
-  (let ((comint-buffer-maximum-size 0))
-    (comint-truncate-buffer)))
+;; Not Working
+;; (defun comint-clear-buffer ()
+;;   "Clear the comint buffer."
+;;   (interactive)
+;;   (let ((comint-buffer-maximum-size 0))
+;;     (comint-truncate-buffer)))
 
 ;; let's bind the new command to a keycombo
-(define-key comint-mode-map "\C-c\M-o" #'comint-clear-buffer)
+;; (define-key comint-mode-map "\C-c\M-o" #'comint-clear-buffer)
 
 (provide 'init)
 

@@ -6,6 +6,10 @@
 /savefiles
 /auto-save-list
 
+flycheck-elm/
+
+node_modules/
+
 # emacs backups and auto-save symbolic links
 *~
 .#*
